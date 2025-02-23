@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Reviews</title>
+    <link rel="stylesheet" href="review_design.css">
+    <link rel="stylesheet" href="design.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<body>
+    <section id="header">
+        <a href="#"><img src="new_logo_svg.svg" class="logo"></a>
+
+        <div>
+            <ul id="navbar">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="shop.html">Shop</a></li>
+                <li><a href="doctors.html">Doctors</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="review.html" class="active">Reviews</a></li>
+                <li id="ig-bag"><a href=""><i class='bx bxs-shopping-bag'></i></a></li>
+                <a href="#" id="close"><i class='bx bx-task-x'></i></a>
+            </ul>
+        </div>
+
+        <div id="mobile">
+            <a href=""><i class='bx bxs-shopping-bag'></i></a>
+            <i id="bar" class='bx bx-menu'></i>
+        </div>
+
+    </section>
+
+    <div class="container">
+        <div class="heading">
+            <h1>Customers Review</h1>
+            <p>What our customers say about MedClick</p>
+        </div>
+        <div class="cards" id="reviewsContainer">
+            <!-- Reviews will be dynamically inserted here -->
+        </div>
+    </div>
+
+    <div class="review">
+        <h1>Give a review</h1>
+        <form id="reviewForm" method="post" action="/post">
+            <p>Customer Name</p>
+            <input type="text" id="customerName" placeholder="Type your name here" name="customerName" required>
+            <p>Review</p>
+            <input type="text" id="customerReview" placeholder="Give your review here" name="review" required>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+    <div class="space">
+
+    </div>
+    <div class="ocean">
+        <div class="wave"></div>
+        <div class="wave"></div>
+    </div>
+    <script>
+        async function fetchReviews() {
+            try {
+                const response = await fetch('/reviews'); // Fetch latest 4 reviews
+                const reviews = await response.json();
+
+                const reviewsContainer = document.getElementById("reviewsContainer");
+                reviewsContainer.innerHTML = ""; // Clear previous content
+
+                reviews.forEach(review => {
+                    const reviewCard = `
+                        <div class="card1">
+                            <div class=hero>
+                                <div class=ribon>
+                                    
+                                </div>    
+                                <div class="image">
+                                    <img src="user.svg" alt="">
+                                    <span>${review.customerName}</span>
+                                </div>
+                            </div>
+                            <h2>MedClick</h2>
+                            <p>${review.review}</p>
+                        </div>
+                    `;
+                    reviewsContainer.innerHTML += reviewCard; // Append new review card
+                });
+            } catch (error) {
+                console.error("Error fetching reviews:", error);
+            }
+        }
+
+        document.getElementById("reviewForm").addEventListener("submit", async function (event) {
+            event.preventDefault(); // Prevent default form submission
+
+            const customerName = document.getElementById("customerName").value;
+            const review = document.getElementById("customerReview").value;
+
+            if (!customerName || !review) {
+                alert("Please fill in all fields!");
+                return;
+            }
+
+            try {
+                const response = await fetch('/post', {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: new URLSearchParams({ customerName, review })
+                });
+
+                const result = await response.json();
+                console.log(result.message); // Log success message
+
+                document.getElementById("customerName").value = "";
+                document.getElementById("customerReview").value = ""; // Clear inputs
+
+                fetchReviews(); // Reload reviews dynamically without refreshing the page
+            } catch (error) {
+                console.error("Error submitting review:", error);
+            }
+        });
+
+        // Fetch reviews when the page loads
+        document.addEventListener("DOMContentLoaded", fetchReviews);
+        const bar = document.getElementById('bar');
+        const close = document.getElementById('close');
+        const nav = document.getElementById('navbar');
+
+        if (bar) {
+            bar.addEventListener('click', () => {
+                nav.classList.add('active');
+            })
+        }
+
+        if (close) {
+            close.addEventListener('click', () => {
+                nav.classList.remove('active');
+            })
+        }
+
+    </script>
+
+    <script src="https://cdn.botpress.cloud/webchat/v2.2/inject.js"></script>
+    <script src="https://files.bpcontent.cloud/2025/02/22/04/20250222045933-HU0JOMXT.js"></script>
+
+
+</body>
+
+</html>
